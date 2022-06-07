@@ -31,7 +31,11 @@ struct ContentView: View {
     
     @State private var pastCards: [pastCard] = [
     ]
-    
+    func addScore(isOver: Bool) {
+        if (isWin(isOver: isOver)) {
+            score += (100/(abs((Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! + Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!)-13)+1))
+        }
+    }
     func isWin(isOver: Bool) -> Bool{
         var card1Value = Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!
         var card2Value = Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!
@@ -57,8 +61,6 @@ struct ContentView: View {
                 return false
             }
         }
-        
-        //let closeness = abs(card1Value + card2Value - 13)
     }
     func makeCard() -> some View{
         return Image(currentCard)
@@ -89,6 +91,7 @@ struct ContentView: View {
                     lastCard = currentCard
                     currentCard = currentCards.randomElement()!
                     pastCards.insert(pastCard(name: lastCard, win: isWin(isOver:true)), at: 0)
+                    addScore(isOver: true)
                 }
             }
     }
@@ -100,6 +103,7 @@ struct ContentView: View {
                     lastCard = currentCard
                     currentCard = currentCards.randomElement()!
                     pastCards.insert(pastCard(name: lastCard, win: isWin(isOver:false)), at: 0)
+                    addScore(isOver: false)
                 }
             }
     }
@@ -120,7 +124,7 @@ struct ContentView: View {
                             } label: {
                                 Image(systemName: "plus")
                             }
-
+                            
                         }
                         ToolbarItem(placement: .navigationBarLeading) {
                             Text(String(cardsUsed) + "/52")
