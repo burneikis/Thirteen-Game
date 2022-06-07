@@ -83,6 +83,8 @@
 			dependencies = (
 			);
 			name = Thirteen;
+			packageProductDependencies = (
+			);
 			productName = Thirteen;
 			productReference = 38345CCD284EF04300688536 /* Thirteen.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +113,8 @@
 				Base,
 			);
 			mainGroup = 38345CC4284EF04300688536;
+			packageReferences = (
+			);
 			productRefGroup = 38345CCE284EF04300688536 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

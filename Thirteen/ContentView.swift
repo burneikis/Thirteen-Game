@@ -36,11 +36,6 @@ struct ContentView: View {
     @State private var pastCards: [pastCard] = []
     @State private var score = 0
     
-    func dwHighScore() {
-        if (userDefaults.object(forKey: "highScore") == nil) {
-            userDefaults.set(0, forKey: "highScore")
-        }
-    }
     func addScore(isOver: Bool) {
         if (isWin(isOver: isOver)) {
             rawScore += (1000/(abs((Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! + Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!)-13)+1))
@@ -89,7 +84,7 @@ struct ContentView: View {
                     }
                 }
         }
-        .frame(height: screenHeight * 0.1)
+        .frame(height: screenHeight * 0.051)
     }
     func makeCard() -> some View{
         return Image(currentCard)
@@ -116,7 +111,7 @@ struct ContentView: View {
         }
     }
     func makeTopButton() -> some View {
-        return Color(red: 1, green: 1, blue: 1, opacity: 0.1)
+        return Color(red: 1, green: 1, blue: 1, opacity: 0.01)
             .onTapGesture {
                 if (currentCards.count > 1) {
                     currentCards.remove(at:currentCards.firstIndex(of: currentCard)!)
@@ -127,7 +122,6 @@ struct ContentView: View {
                     cardsUsed += 1
                 }
                 else {
-                    dwHighScore()
                     showFinishedSheet.toggle()
                     pastCards.removeAll()
                     currentCards = cards
@@ -135,7 +129,7 @@ struct ContentView: View {
             }
     }
     func makeBottomButton() -> some View {
-        return Color(red: 1, green: 1, blue: 1, opacity: 0.1)
+        return Color(red: 1, green: 1, blue: 1, opacity: 0.01)
             .onTapGesture {
                 if (currentCards.count > 1) {
                     currentCards.remove(at:currentCards.firstIndex(of: currentCard)!)
@@ -148,7 +142,6 @@ struct ContentView: View {
                     cardsUsed += 1
                 }
                 else {
-                    dwHighScore()
                     showFinishedSheet.toggle()
                     pastCards.removeAll()
                     currentCards = cards
@@ -161,6 +154,38 @@ struct ContentView: View {
             makeBottomButton()
         }
     }
+    func sheetDismissed() {
+        if score > userDefaults.integer(forKey: "highScore") {
+            userDefaults.set(score, forKey: "highScore")
+        }
+        rawScore = 0
+        wins = 0
+        cardsUsed = 1
+    }
+    func makeSheetContent() -> some View{
+        VStack {
+            Spacer()
+            Text("High Score")
+            Text(String(userDefaults.integer(forKey: "highScore")))
+                .font(Font.system(size: 40))
+            Spacer()
+            Text(score > userDefaults.integer(forKey: "highScore") ? "New High Score!" : "Score")
+            Text(String(score))
+                .font(Font.system(size: 90))
+                .bold()
+            Button {
+                showFinishedSheet.toggle()
+            } label: {
+                Text("Play Again")
+                    .font(Font.system(size: 30))
+                    .bold()
+            }
+            Spacer()
+            Spacer()
+            Spacer()
+        }
+    }
+    
     var body: some View {
         VStack {
             makeToolBar()
@@ -171,38 +196,12 @@ struct ContentView: View {
                 }
                 makeButtons()
             }
-            .frame(height: screenHeight * 0.9)
+            
         }
-        .sheet(isPresented: $showFinishedSheet, onDismiss: {
-            if score > userDefaults.integer(forKey: "highScore") {
-                userDefaults.set(score, forKey: "highScore")
-            }
-            rawScore = 0
-            wins = 0
-            cardsUsed = 1
-        }) {
-            VStack {
-                Spacer()
-                Text("High Score")
-                Text(String(userDefaults.integer(forKey: "highScore")))
-                    .font(Font.system(size: 40))
-                Spacer()
-                Text(score > userDefaults.integer(forKey: "highScore") ? "New High Score!" : "Score")
-                Text(String(score))
-                    .font(Font.system(size: 90))
-                    .bold()
-                Button {
-                    showFinishedSheet.toggle()
-                } label: {
-                    Text("Play Again")
-                        .font(Font.system(size: 30))
-                        .bold()
-                }
-                Spacer()
-                Spacer()
-                Spacer()
-
-            }
+            .sheet(isPresented: $showFinishedSheet, onDismiss: {
+                sheetDismissed()
+            }) {
+            makeSheetContent()
         }
     }
 }
@@ -210,5 +209,6 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .previewInterfaceOrientation(.portrait)
     }
 }

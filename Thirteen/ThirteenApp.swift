@@ -9,6 +9,11 @@ import SwiftUI
 
 @main
 struct ThirteenApp: App {
+    init() {
+            UserDefaults.standard.register(defaults: [
+                "highScore": 0
+            ])
+        }
     var body: some Scene {
         WindowGroup {
             ContentView()
