@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 let screenSize: CGRect = UIScreen.main.bounds
 let screenWidth = screenSize.width
 let screenHeight = screenSize.height
@@ -75,11 +76,9 @@ struct ContentView: View {
                     }
                     ToolbarItem(placement: .status) {
                         Text(String(score))
-                            .foregroundColor(Color.blue)
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Text(String(cardsUsed) + "/52")
-                            .foregroundColor(Color.blue)
                     }
                 }
         }
