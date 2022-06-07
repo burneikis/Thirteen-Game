@@ -15,7 +15,7 @@ let cards = ["1S", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "11S",
 var currentCards = cards
 
 let green = UIColor(red:0,green:1,blue:0,alpha: 0.3)
-let red = UIColor(red:1,green:0,blue:0,alpha: 0.4)
+let red = UIColor(red:1,green:0,blue:0,alpha: 0.3)
 
 private struct pastCard: Identifiable {
     let name: String
