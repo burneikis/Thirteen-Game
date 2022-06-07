@@ -24,16 +24,19 @@ private struct pastCard: Identifiable {
 }
 
 struct ContentView: View {
+    @State private var showFinishedSheet = false
     @State private var currentCard = currentCards.randomElement()!
     @State private var lastCard = "gray_back"
     @State private var cardsUsed = 1
-    @State private var score = 0
+    @State private var rawScore = 0
+    @State private var wins = 0
     
     @State private var pastCards: [pastCard] = [
     ]
     func addScore(isOver: Bool) {
         if (isWin(isOver: isOver)) {
-            score += (100/(abs((Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! + Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!)-13)+1))
+            rawScore += (1000/(abs((Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! + Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!)-13)+1))
+            wins += 1
         }
     }
     func isWin(isOver: Bool) -> Bool{
@@ -67,6 +70,7 @@ struct ContentView: View {
             .resizable()
             .scaledToFit()
     }
+    
     func makeLastCards() -> some View {
         return ScrollView(.horizontal) {
             HStack(spacing: -40) {
@@ -80,6 +84,8 @@ struct ContentView: View {
                             .frame(width: screenWidth * 0.21, height: screenHeight * 0.15)
                     }
                 }
+                Color.clear
+                    .frame(height: screenHeight * 0.15)
             }
         }
     }
@@ -92,6 +98,12 @@ struct ContentView: View {
                     currentCard = currentCards.randomElement()!
                     pastCards.insert(pastCard(name: lastCard, win: isWin(isOver:true)), at: 0)
                     addScore(isOver: true)
+                    cardsUsed += 1
+                }
+                else {
+                    showFinishedSheet.toggle()
+                    pastCards.removeAll()
+                    currentCards = cards
                 }
             }
     }
@@ -103,7 +115,15 @@ struct ContentView: View {
                     lastCard = currentCard
                     currentCard = currentCards.randomElement()!
                     pastCards.insert(pastCard(name: lastCard, win: isWin(isOver:false)), at: 0)
-                    addScore(isOver: false)
+                    if (Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! > 3) {
+                        addScore(isOver: false)
+                    }
+                    cardsUsed += 1
+                }
+                else {
+                    showFinishedSheet.toggle()
+                    pastCards.removeAll()
+                    currentCards = cards
                 }
             }
     }
@@ -118,20 +138,15 @@ struct ContentView: View {
             NavigationView {
                 HStack {}
                     .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button {
-                                
-                            } label: {
-                                Image(systemName: "plus")
-                            }
-                            
-                        }
                         ToolbarItem(placement: .navigationBarLeading) {
-                            Text(String(cardsUsed) + "/52")
+                            Text(String(100*wins/(cardsUsed-1 == 0 ? 1 : cardsUsed - 1)) + "%")
+                        }
+                        ToolbarItem(placement: .principal) {
+                            Text(String(rawScore))
                                 .foregroundColor(Color.blue)
                         }
-                        ToolbarItem(placement: .status) {
-                            Text(String(score))
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Text(String(cardsUsed) + "/52")
                                 .foregroundColor(Color.blue)
                         }
                     }
@@ -145,6 +160,12 @@ struct ContentView: View {
                 makeButtons()
             }
             .frame(height: screenHeight * 0.9)
+        }
+        .sheet(isPresented: $showFinishedSheet, onDismiss: {
+            rawScore = 0
+            cardsUsed = 1
+        }) {
+            Text("score:" + String(rawScore))
         }
     }
 }
