@@ -18,6 +18,8 @@ var currentCards = cards
 let green = UIColor(red:0,green:1,blue:0,alpha: 0.3)
 let red = UIColor(red:1,green:0,blue:0,alpha: 0.3)
 
+let userDefaults = UserDefaults.standard
+
 private struct pastCard: Identifiable {
     let name: String
     let win: Bool
@@ -34,6 +36,11 @@ struct ContentView: View {
     @State private var pastCards: [pastCard] = []
     @State private var score = 0
     
+    func dwHighScore() {
+        if (userDefaults.object(forKey: "highScore") == nil) {
+            userDefaults.set(0, forKey: "highScore")
+        }
+    }
     func addScore(isOver: Bool) {
         if (isWin(isOver: isOver)) {
             rawScore += (1000/(abs((Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! + Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!)-13)+1))
@@ -120,6 +127,7 @@ struct ContentView: View {
                     cardsUsed += 1
                 }
                 else {
+                    dwHighScore()
                     showFinishedSheet.toggle()
                     pastCards.removeAll()
                     currentCards = cards
@@ -140,6 +148,7 @@ struct ContentView: View {
                     cardsUsed += 1
                 }
                 else {
+                    dwHighScore()
                     showFinishedSheet.toggle()
                     pastCards.removeAll()
                     currentCards = cards
@@ -165,14 +174,23 @@ struct ContentView: View {
             .frame(height: screenHeight * 0.9)
         }
         .sheet(isPresented: $showFinishedSheet, onDismiss: {
-            score = 0
+            if score > userDefaults.integer(forKey: "highScore") {
+                userDefaults.set(score, forKey: "highScore")
+            }
+            rawScore = 0
             wins = 0
             cardsUsed = 1
         }) {
             VStack {
-            Text(String(score))
-                .font(Font.system(size: 90))
-                .bold()
+                Spacer()
+                Text("High Score")
+                Text(String(userDefaults.integer(forKey: "highScore")))
+                    .font(Font.system(size: 40))
+                Spacer()
+                Text(score > userDefaults.integer(forKey: "highScore") ? "New High Score!" : "Score")
+                Text(String(score))
+                    .font(Font.system(size: 90))
+                    .bold()
                 Button {
                     showFinishedSheet.toggle()
                 } label: {
@@ -180,6 +198,9 @@ struct ContentView: View {
                         .font(Font.system(size: 30))
                         .bold()
                 }
+                Spacer()
+                Spacer()
+                Spacer()
 
             }
         }
