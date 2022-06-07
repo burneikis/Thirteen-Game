@@ -26,7 +26,8 @@ private struct pastCard: Identifiable {
 struct ContentView: View {
     @State private var currentCard = currentCards.randomElement()!
     @State private var lastCard = "gray_back"
-    @State private var win = true
+    @State private var cardsUsed = 1
+    @State private var score = 0
     
     @State private var pastCards: [pastCard] = [
     ]
@@ -56,6 +57,8 @@ struct ContentView: View {
                 return false
             }
         }
+        
+        //let closeness = abs(card1Value + card2Value - 13)
     }
     func makeCard() -> some View{
         return Image(currentCard)
@@ -107,12 +110,37 @@ struct ContentView: View {
         }
     }
     var body: some View {
-        ZStack {
-            VStack() {
-                makeCard()
-                makeLastCards()
+        VStack {
+            NavigationView {
+                HStack {}
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button {
+                                
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+
+                        }
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Text(String(cardsUsed) + "/52")
+                                .foregroundColor(Color.blue)
+                        }
+                        ToolbarItem(placement: .status) {
+                            Text(String(score))
+                                .foregroundColor(Color.blue)
+                        }
+                    }
             }
-            makeButtons()
+            .frame(height: screenHeight * 0.1)
+            ZStack {
+                VStack() {
+                    makeCard()
+                    makeLastCards()
+                }
+                makeButtons()
+            }
+            .frame(height: screenHeight * 0.9)
         }
     }
 }
