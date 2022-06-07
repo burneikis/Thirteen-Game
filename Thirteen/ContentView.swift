@@ -11,9 +11,12 @@ let screenSize: CGRect = UIScreen.main.bounds
 let screenWidth = screenSize.width
 let screenHeight = screenSize.height
 
-let cards = ["1S", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "11S", "12S", "13S","1D", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "11D", "12D", "13D","1C", "2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "10C", "11C", "12C", "13C","1H", "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "11H", "12H", "13H"]
+let cards = [
+    "1S", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "11S", "12S", "13S","1D", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "11D", "12D", "13D","1C", "2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "10C", "11C", "12C", "13C","1H", "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "11H", "12H", "13H"
+]
 
 var currentCards = cards
+var lastCard = "gray_back"
 
 let green = UIColor(red:0,green:1,blue:0,alpha: 0.3)
 let red = UIColor(red:1,green:0,blue:0,alpha: 0.3)
@@ -27,14 +30,16 @@ private struct pastCard: Identifiable {
 }
 
 struct ContentView: View {
-    @State private var showFinishedSheet = false
     @State private var currentCard = currentCards.randomElement()!
-    @State private var lastCard = "gray_back"
+    @State private var pastCards: [pastCard] = []
+    
     @State private var cardsUsed = 1
     @State private var rawScore = 0
     @State private var wins = 0
-    @State private var pastCards: [pastCard] = []
+    
     @State private var score = 0
+    
+    @State private var showFinishedSheet = false
     
     func addScore(isOver: Bool) {
         if (isWin(isOver: isOver)) {
@@ -69,6 +74,7 @@ struct ContentView: View {
             }
         }
     }
+    
     func makeToolBar() -> some View{
         return NavigationView {
             HStack {}
@@ -77,7 +83,7 @@ struct ContentView: View {
                         Text(String(100*wins/(cardsUsed-1 == 0 ? 1 : cardsUsed - 1)) + "%")
                     }
                     ToolbarItem(placement: .status) {
-                        Text(String(score))
+                        Text("Points: " + String(rawScore))
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Text(String(cardsUsed) + "/52")
@@ -86,12 +92,12 @@ struct ContentView: View {
         }
         .frame(height: screenHeight * 0.051)
     }
+    
     func makeCard() -> some View{
         return Image(currentCard)
             .resizable()
             .scaledToFit()
     }
-    
     func makeLastCards() -> some View {
         return ScrollView(.horizontal) {
             HStack(spacing: -40) {
@@ -110,6 +116,7 @@ struct ContentView: View {
             }
         }
     }
+    
     func makeTopButton() -> some View {
         return Color(red: 1, green: 1, blue: 1, opacity: 0.01)
             .onTapGesture {
@@ -154,6 +161,7 @@ struct ContentView: View {
             makeBottomButton()
         }
     }
+    
     func sheetDismissed() {
         if score > userDefaults.integer(forKey: "highScore") {
             userDefaults.set(score, forKey: "highScore")
