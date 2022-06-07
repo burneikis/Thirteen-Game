@@ -30,14 +30,15 @@ struct ContentView: View {
     @State private var cardsUsed = 1
     @State private var rawScore = 0
     @State private var wins = 0
+    @State private var pastCards: [pastCard] = []
+    @State private var score = 0
     
-    @State private var pastCards: [pastCard] = [
-    ]
     func addScore(isOver: Bool) {
         if (isWin(isOver: isOver)) {
             rawScore += (1000/(abs((Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))! + Int(currentCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!)-13)+1))
             wins += 1
         }
+        score = rawScore*wins/(cardsUsed-1 == 0 ? 1 : cardsUsed - 1)
     }
     func isWin(isOver: Bool) -> Bool{
         var card1Value = Int(lastCard.trimmingCharacters(in: CharacterSet(charactersIn: "SDCH")))!
@@ -64,6 +65,25 @@ struct ContentView: View {
                 return false
             }
         }
+    }
+    func makeToolBar() -> some View{
+        return NavigationView {
+            HStack {}
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Text(String(100*wins/(cardsUsed-1 == 0 ? 1 : cardsUsed - 1)) + "%")
+                    }
+                    ToolbarItem(placement: .status) {
+                        Text(String(score))
+                            .foregroundColor(Color.blue)
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Text(String(cardsUsed) + "/52")
+                            .foregroundColor(Color.blue)
+                    }
+                }
+        }
+        .frame(height: screenHeight * 0.1)
     }
     func makeCard() -> some View{
         return Image(currentCard)
@@ -135,23 +155,7 @@ struct ContentView: View {
     }
     var body: some View {
         VStack {
-            NavigationView {
-                HStack {}
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Text(String(100*wins/(cardsUsed-1 == 0 ? 1 : cardsUsed - 1)) + "%")
-                        }
-                        ToolbarItem(placement: .principal) {
-                            Text(String(rawScore))
-                                .foregroundColor(Color.blue)
-                        }
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Text(String(cardsUsed) + "/52")
-                                .foregroundColor(Color.blue)
-                        }
-                    }
-            }
-            .frame(height: screenHeight * 0.1)
+            makeToolBar()
             ZStack {
                 VStack() {
                     makeCard()
@@ -162,10 +166,23 @@ struct ContentView: View {
             .frame(height: screenHeight * 0.9)
         }
         .sheet(isPresented: $showFinishedSheet, onDismiss: {
-            rawScore = 0
+            score = 0
+            wins = 0
             cardsUsed = 1
         }) {
-            Text("score:" + String(rawScore))
+            VStack {
+            Text(String(score))
+                .font(Font.system(size: 90))
+                .bold()
+                Button {
+                    showFinishedSheet.toggle()
+                } label: {
+                    Text("Play Again")
+                        .font(Font.system(size: 30))
+                        .bold()
+                }
+
+            }
         }
     }
 }
