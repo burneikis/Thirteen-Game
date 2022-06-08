@@ -130,8 +130,6 @@ struct ContentView: View {
                 }
                 else {
                     showFinishedSheet.toggle()
-                    pastCards.removeAll()
-                    currentCards = cards
                 }
             }
     }
@@ -150,8 +148,6 @@ struct ContentView: View {
                 }
                 else {
                     showFinishedSheet.toggle()
-                    pastCards.removeAll()
-                    currentCards = cards
                 }
             }
     }
@@ -169,6 +165,8 @@ struct ContentView: View {
         rawScore = 0
         wins = 0
         cardsUsed = 1
+        pastCards.removeAll()
+        currentCards = cards
     }
     func makeSheetContent() -> some View{
         VStack {
